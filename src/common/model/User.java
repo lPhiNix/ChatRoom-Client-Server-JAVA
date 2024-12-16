@@ -2,15 +2,25 @@ package common.model;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 public class User {
     private String name;
-    private String password;
     private InetAddress address;
-    public User(String name, String password, String ip) throws UnknownHostException {
+    public User(String name, String ip) throws UnknownHostException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("User name cannot be null or empty!");
+        }
         this.name = name;
-        this.password = password;
         this.address = InetAddress.getByName(ip);
+    }
+
+    public User(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("User name cannot be null or empty!");
+        }
+
+        this.name = name;
     }
 
     public String getName() {
@@ -19,14 +29,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getAddress() {
@@ -46,10 +48,22 @@ public class User {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(name, user.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", address=" + address +
                 '}';
     }

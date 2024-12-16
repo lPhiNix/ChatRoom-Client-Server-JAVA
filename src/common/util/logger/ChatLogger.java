@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.*;
 
-public class ChatLogger extends Logger {
+public class ChatLogger {
     private static final Logger logger = Logger.getLogger(ChatLogger.class.getName());
 
     static {
@@ -19,14 +19,10 @@ public class ChatLogger extends Logger {
 
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(new CustomFormatter());
-        logger.addHandler(consoleHandler);
+        rootLogger.addHandler(consoleHandler);
 
-        logger.setLevel(Level.ALL);
+        rootLogger.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.ALL);
-    }
-
-    protected ChatLogger(String name) {
-        super(name, null);
     }
 
     public static Logger getLogger(String className) {
