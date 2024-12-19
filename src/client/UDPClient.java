@@ -1,9 +1,9 @@
 package client;
 
+import common.command.commands.LoginCommand;
 import common.logger.ChatLogger;
 import common.command.CommandFactory;
 import common.command.commands.ExitCommand;
-import common.command.commands.LoginCommand;
 import common.model.User;
 import common.socket.UDPSocketCommunication;
 
