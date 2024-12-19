@@ -24,7 +24,7 @@ public abstract class AbstractUDPClient implements Client {
     public void connect() {
         try {
             clientSocket = UDPUtil.createSocket();
-            System.out.println("Connected to server at " + serverAddress + ":" + serverAddress.getPort());
+            System.out.println("Connected to server at " + serverAddress);
         } catch (SocketException e) {
             logger.log(Level.SEVERE, "Failed to connect: " + e.getMessage());
         }
