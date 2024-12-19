@@ -1,11 +1,9 @@
-package main;
-
 import client.UDPClient;
 import common.model.User;
 
 import java.net.InetSocketAddress;
 
-public class Client2 {
+public class Main {
     public static void main(String[] args) {
         User user = UDPClient.promptUserDetails(12345);
         UDPClient client = new UDPClient(new InetSocketAddress("localhost", 12345), user);
