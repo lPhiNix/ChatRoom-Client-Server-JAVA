@@ -8,7 +8,7 @@ usuarios. A continuación, te haré una descripción detallada de cómo funciona
 ## Estructura del Proyecto
 
 ```text
-    src
+src
 ├───client                        // Paquete que contiene las clases del cliente
 │   ├───AbstractUDPClient.java    // Clase base para el cliente UDP, maneja la conexión y envío de mensajes
 │   ├───ANSIColor.java            // Clase que define códigos de colores ANSI para formatear la salida en consola
