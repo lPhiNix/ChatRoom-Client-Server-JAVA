@@ -1,5 +1,6 @@
 package server;
 
+import common.socket.UDPSocketCommunication;
 import common.socket.UDPUtil;
 import common.command.CommandFactory;
 import common.data.UserManager;
@@ -46,7 +47,7 @@ public abstract class AbstractUDPServer implements Server {
         if (serverSocket != null && !serverSocket.isClosed()) {
             isRunning.set(false);
             serverSocket.close();
-            logger.log(Level.INFO, "Server stopped.");
+            logger.log(Level.CONFIG, "Server stopped.");
         }
     }
 
@@ -72,14 +73,13 @@ public abstract class AbstractUDPServer implements Server {
 
     @Override
     public void sendMessage(String message, InetSocketAddress clientAddress) throws IOException {
-        byte[] data = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length, clientAddress.getAddress(), clientAddress.getPort());
+        UDPSocketCommunication.sendMessage(serverSocket, message, clientAddress);
         logger.log(Level.INFO, "Sending message to " + clientAddress + ": " + message);
-        serverSocket.send(packet);
     }
 
     public void sendHistory(InetSocketAddress clientAddress) throws IOException {
         List<Message> history = messageHistoryManager.getHistory();
+        logger.log(Level.INFO, "Sending history to new user from " + clientAddress);
         for (Message message : history) {
             sendMessage(message.toString(), clientAddress);
         }

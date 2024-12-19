@@ -1,6 +1,7 @@
 package client;
 
 import common.logger.ChatLogger;
+import common.socket.UDPSocketCommunication;
 import common.socket.UDPUtil;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public abstract class AbstractUDPClient implements Client {
     public void connect() {
         try {
             clientSocket = UDPUtil.createSocket();
-            logger.log(Level.INFO, "Connected to server at " + serverAddress + ":" + serverAddress.getPort());
+            System.out.println("Connected to server at " + serverAddress + ":" + serverAddress.getPort());
         } catch (SocketException e) {
             logger.log(Level.SEVERE, "Failed to connect: " + e.getMessage());
         }
@@ -33,7 +34,7 @@ public abstract class AbstractUDPClient implements Client {
     public void disconnect() {
         if (clientSocket != null && !clientSocket.isClosed()) {
             clientSocket.close();
-            logger.log(Level.INFO, "Disconnected from server.");
+            System.out.println("Disconnected from server.");
         }
     }
 
@@ -42,9 +43,6 @@ public abstract class AbstractUDPClient implements Client {
 
     @Override
     public void sendMessage(String message) throws IOException {
-        byte[] data = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length, serverAddress.getAddress(), userPort);
-        logger.info("Sending packet to server: " + message);
-        clientSocket.send(packet);
+        UDPSocketCommunication.sendMessage(clientSocket, message, serverAddress);
     }
 }

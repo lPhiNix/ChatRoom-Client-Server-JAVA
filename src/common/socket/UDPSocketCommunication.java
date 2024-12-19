@@ -9,20 +9,20 @@ import java.util.logging.Logger;
 
 public class UDPSocketCommunication {
     private static final Logger logger = ChatLogger.getLogger(UDPSocketCommunication.class.getName());
-    public static void sendMessage(DatagramSocket socket, String message, String address, int port) {
+    public static void sendMessage(DatagramSocket socket, String message, InetSocketAddress address) {
         try {
             byte[] buffer = message.getBytes();
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(address), port);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(address.getHostName()), address.getPort());
             socket.send(packet);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to send message: " + e.getMessage());
         }
     }
 
-    public static String receiveMessage(DatagramSocket socket) throws IOException {
+    public static DatagramPacket receiveMessage(DatagramSocket socket) throws IOException {
         byte[] buffer = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
-        return new String(packet.getData(), 0, packet.getLength());
+        return packet;
     }
 }

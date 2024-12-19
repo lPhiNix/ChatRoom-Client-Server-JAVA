@@ -5,6 +5,7 @@ import common.command.CommandFactory;
 import common.command.commands.ExitCommand;
 import common.command.commands.LoginCommand;
 import common.model.User;
+import common.socket.UDPSocketCommunication;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -13,9 +14,12 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static client.ANSIColor.*;
+
 public class UDPClient extends AbstractUDPClient {
     private static final Logger logger = ChatLogger.getLogger(UDPClient.class.getName());
     private User user;
+
     public UDPClient(InetSocketAddress serverAddress, User user) {
         super(serverAddress, user.getAddress().getPort());
         this.user = user;
@@ -26,7 +30,6 @@ public class UDPClient extends AbstractUDPClient {
         try {
             String loginCommand = CommandFactory.COMMAND_SYMBOL + LoginCommand.getCommandName() + " " + user.getUsername();
 
-            logger.info("Sending login command: " + loginCommand);
             sendMessage(loginCommand);
 
             Thread listenerThread = startListenerThread();
@@ -38,12 +41,9 @@ public class UDPClient extends AbstractUDPClient {
 
     @Override
     protected void listen() {
-        byte[] buffer = new byte[1024];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                clientSocket.receive(packet);
+                DatagramPacket packet = UDPSocketCommunication.receiveMessage(clientSocket);
                 handleReceiveMessage(packet);
             } catch (IOException e) {
                 handleReceiveError(e);
@@ -54,25 +54,24 @@ public class UDPClient extends AbstractUDPClient {
     private Thread startListenerThread() {
         Thread listenerThread = new Thread(() -> listen());
         listenerThread.start();
-        logger.info("Listener thread started.");
         return listenerThread;
     }
 
     private void handleExitCommand(Thread listenerThread) {
-        logger.info("Exit command received. Ending session.");
+        System.out.println(CYAN.get() + BOLD.get() + "Ending session..." + RESET.get());
         try {
             sendMessage(CommandFactory.COMMAND_SYMBOL + ExitCommand.getCommandName());
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error sending exit command: " + e.getMessage(), e);
         }
         listenerThread.interrupt();
-        logger.info("Listener thread interrupted.");
     }
 
     protected void handleUserInput(Thread listenerThread) {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
+            System.out.print(CYAN.get() + "> " + RESET.get());  // Prompt color
             String input = scanner.nextLine();
             if (isExitCommand(input)) {
                 handleExitCommand(listenerThread);
@@ -89,7 +88,6 @@ public class UDPClient extends AbstractUDPClient {
     }
 
     protected void processUserInput(String input) {
-        logger.info("Sending command: " + input);
         try {
             sendMessage(input);
         } catch (IOException e) {
@@ -99,21 +97,26 @@ public class UDPClient extends AbstractUDPClient {
 
     protected void handleReceiveMessage(DatagramPacket packet) {
         String message = new String(packet.getData(), 0, packet.getLength());
-        logger.info("Message received from server: " + message);
-        System.out.println(message);
+        if (message.startsWith("ERROR")) {
+            System.out.println(RED.get() + "[ERROR] " + RESET.get() + message);
+        } else {
+            System.out.println(CYAN.get() + BOLD.get() + message + RESET.get());  // Server message with style
+        }
     }
 
     protected void handleReceiveError(IOException e) {
         if (!Thread.currentThread().isInterrupted()) {
             logger.log(Level.SEVERE, "Error receiving message: " + e.getMessage(), e);
+            System.out.println(RED.get() + "[ERROR] " + e.getMessage() + RESET.get());
         }
     }
 
     public static User promptUserDetails(int userPort) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your username: ");
+        System.out.println(YELLOW.get() + BOLD.get() + "Welcome to the Chat Client!" + RESET.get());
+        System.out.print(GREEN.get() + "Enter your username: " + RESET.get());
         String username = scanner.nextLine();
-        logger.info("Username entered: " + username);
+        System.out.println(CYAN.get() + "Username entered: " + UNDERLINE.get() + username + RESET.get());
         return new User(username, new InetSocketAddress("localhost", userPort));
     }
 }

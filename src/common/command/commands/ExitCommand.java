@@ -32,7 +32,7 @@ public class ExitCommand implements Command {
         UDPServer server = context.getServer();
         User user = server.getUserManager().getUserByAddress(clientAddress);
         if (user != null) {
-            logger.log(Level.INFO, "User disconnected: " + user.getUsername());
+            logger.log(Level.CONFIG, "User disconnected: " + user.getUsername());
             server.getUserManager().removeUser(user.getUsername());
             server.broadcastMessage(new Message(user, "has disconnected."), null);
         }
